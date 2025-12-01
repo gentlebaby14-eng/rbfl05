@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Now Showing | 나만의 영화관</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .home-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      margin-top: 30px;
+      margin-left: 50px;
+      padding: 10px 18px;
+      background: #0e0d0dc5;
+      color: #fddf7b;
+      border-radius: 12px;
+      border: 1px solid #fddf7b;
+      font-weight: 600;
+      text-decoration: none;
+      text-shadow:
+      0 0 6px rgba(255, 233, 163, 0.9),
+      0 0 16px rgba(255, 120, 120, 0.8);
+      box-shadow: 0 4px 12px rgba(251, 14, 14, 0.226);
+      transition: 0.2s ease;
+    }
+
+    .home-btn:hover {
+      background: #080808;
+      transform: translateY(-2px);
+    }
+
+
+    body {
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+      background:
+        radial-gradient(circle at top, #2c2c3a 0, #050509 55%, #000000 100%);
+      color: #f5f5f5;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* 상단 영화관 네온 간판 */
+    .cinema-header {
+      padding: 32px 16px 12px;
+      text-align: center;
+    }
+
+    .cinema-sign {
+      display: inline-block;
+      padding: 14px 26px;
+      border-radius: 999px;
+      border: 3px solid #fddf7b;
+      background: rgba(10, 10, 10, 0.9);
+      box-shadow:
+        0 0 12px rgba(253, 223, 123, 0.8),
+        0 0 32px rgba(255, 70, 70, 0.5);
+    }
+
+    .cinema-sign-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #ffe9a3;
+      text-shadow:
+        0 0 6px rgba(255, 233, 163, 0.9),
+        0 0 16px rgba(255, 120, 120, 0.8);
+    }
+
+    .cinema-subtitle {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #ddd;
+      opacity: 0.9;
+    }
+
+    /* NOW SHOWING 마퀴 */
+    .marquee-wrap {
+      margin-top: 18px;
+      padding: 8px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(to right, #111, #22111c, #111);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee-move 18s linear infinite;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fddf7b;
+    }
+
+    @keyframes marquee-move {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 28px auto 40px;
+      padding: 0 16px 40px;
+      position: relative;
+    }
+
+    /* 좌우 영화 필름 장식 */
+    .film-strip {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 26px;
+      border-left: 4px solid #444;
+      border-right: 4px solid #444;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #111 0,
+          #111 24px,
+          #444 24px,
+          #444 40px
+        );
+      opacity: 0.6;
+      z-index: -1;
+    }
+    .film-strip.left {
+      left: 0;
+    }
+    .film-strip.right {
+      right: 0;
+    }
+
+    /* 영화 카드 그리드 */
+    .section-title {
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+      color: #fddf7b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 22px;
+    }
+
+    .movie-card {
+      background: radial-gradient(circle at top, #272738, #13131c 55%, #06060a);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.8),
+        0 0 12px rgba(0, 0, 0, 0.9);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border 0.18s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .movie-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      border: 1px dashed rgba(253, 223, 123, 0.18);
+      pointer-events: none;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.9),
+        0 0 20px rgba(253, 223, 123, 0.6);
+      border-color: rgba(253, 223, 123, 0.6);
+    }
+
+    .movie-poster {
+      width: 100%;
+      height: 240px;
+      object-fit: contain;
+      background: linear-gradient(135deg, #333950, #1d1d27);
+      filter: saturate(1.1) contrast(1.05);
+    }
+
+    /* 포스터 없는 경우를 대비한 텍스트 레이블 */
+    .movie-poster[alt*="포스터"] {
+      font-size: 0;
+    }
+
+    .movie-content {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .movie-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .movie-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .movie-year {
+      font-size: 0.8rem;
+      color: #fddf7b;
+      opacity: 0.9;
+    }
+
+    .movie-meta {
+      font-size: 0.8rem;
+      color: #b8b8c8;
+    }
+
+    .movie-desc {
+      font-size: 0.86rem;
+      color: #e4e4ec;
+      margin-top: 4px;
+    }
+
+    /* 태그 = 장르/키워드 */
+    .tags {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(253, 223, 123, 0.5);
+      color: #fddf7b;
+    }
+
+    .movie-card.coming-soon {
+      width: 260px;
+      height: 420px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .movie-card.coming-soon .coming-content h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .movie-card.coming-soon .coming-content p {
+      font-size: 15px;
+      color: #cccccc;
+    }
+
+    /* 하단 작은 문구 */
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #aaa;
+      padding-bottom: 18px;
+    }
+
+    footer span {
+      color: #fddf7b;
+    }
+
+    @media (max-width: 768px) {
+      .cinema-sign-title {
+        font-size: 1.5rem;
+        letter-spacing: 0.14em;
+      }
+      .film-strip {
+        display: none;
+      }
+      main {
+        padding: 0 14px 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="../MAIN/main.html" class="home-btn">← 홈으로 돌아가기</a>
+
+  <!-- 좌우 영화 필름 장식 -->
+  <div class="film-strip left"></div>
+  <div class="film-strip right"></div>
+
+  <!-- 상단 영화관 간판 영역 -->
+  <header class="cinema-header">
+    <div class="cinema-sign">
+      <div class="cinema-sign-title">GGV</div>
+      <p class="cinema-subtitle">추천 상영작 · 마음속에 오래 남는 영화들</p>
+    </div>
+
+    <div class="marquee-wrap">
+      <div class="marquee">
+        <span>
+          🎬 NOW SHOWING · 죽은 시인의 사회 · 미나리 · 리틀 포레스트 · 이터널 선샤인 · 7번방의 선물 · 위키드 ·
+          🎬 NOW SHOWING · 죽은 시인의 사회 · 미나리 · 리틀 포레스트 · 이터널 선샤인 · 7번방의 선물 · 위키드 ·
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h2 class="section-title">NOW SHOWING</h2>
+
+    <section class="movie-grid">
+      <!-- 죽은 시인의 사회 -->
+      <article class="movie-card">
+        <!-- 포스터 이미지 파일 있으면 src 바꾸기 -->
+        <img class="movie-poster" src="죽은 시인의 사회.jpg" alt="죽은 시인의 사회 포스터">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">죽은 시인의 사회</h3>
+            <span class="movie-year">1989</span>
+          </div>
+          <p class="movie-meta">피터 위어 감독 · 드라마</p>
+          <p class="movie-desc">
+            보수적인 기숙학교에 부임한 영어 교사 키팅과 학생들이 ‘카르페 디엠(오늘을 즐겨라)’을
+            통해 자기만의 삶을 찾아가는 순간들을 담은 영화.
+          </p>
+          <div class="tags">
+            <span class="tag">청춘</span>
+            <span class="tag">자유</span>
+            <span class="tag">명대사 가득</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 미나리 -->
+      <article class="movie-card">
+        <img class="movie-poster" src="미나리.jpg" alt="미나리 포스터">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">미나리</h3>
+            <span class="movie-year">2020</span>
+          </div>
+          <p class="movie-meta">정이삭 감독 · 드라마</p>
+          <p class="movie-desc">
+            미국 남부 시골, 낯선 땅에서 농장을 시작한 한국계 가족의 버티고 견디는 이야기.
+            조용하지만 오래 남는 가족의 온기를 느낄 수 있는 작품.
+          </p>
+          <div class="tags">
+            <span class="tag">가족</span>
+            <span class="tag">이민</span>
+            <span class="tag">잔잔한 감동</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 리틀 포레스트 -->
+      <article class="movie-card">
+        <img class="movie-poster" src="리틀 포레스트.jpg" alt="리틀 포레스트 포스터">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">리틀 포레스트</h3>
+            <span class="movie-year">2018</span>
+          </div>
+          <p class="movie-meta">임순례 감독 · 드라마</p>
+          <p class="movie-desc">
+            도시 생활에 지친 혜원이 고향으로 돌아와 사계절의 음식과 함께
+            자신만의 속도를 되찾아 가는 힐링 무비.
+          </p>
+          <div class="tags">
+            <span class="tag">힐링</span>
+            <span class="tag">시골 라이프</span>
+            <span class="tag">음식</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 이터널 선샤인 -->
+      <article class="movie-card">
+        <img class="movie-poster" src="이터널 션사인.jpg" alt="이터널 선샤인 포스터">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">이터널 선샤인</h3>
+            <span class="movie-year">2004</span>
+          </div>
+          <p class="movie-meta">미셸 공드리 감독 · 로맨스 · SF</p>
+          <p class="movie-desc">
+            서로의 기억을 지워버린 연인이, 잊고 싶은 상처와 잊고 싶지 않은 순간 사이에서
+            다시 서로에게 다가가는 독특한 사랑 이야기.
+          </p>
+          <div class="tags">
+            <span class="tag">로맨스</span>
+            <span class="tag">기억</span>
+            <span class="tag">몽환적인 분위기</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 위키드 -->
+      <article class="movie-card">
+        <img class="movie-poster" src="위키드.jpg" alt="위키드">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">위키드</h3>
+            <span class="movie-year">2024</span>
+          </div>
+          <p class="movie-meta">존 M. 츄 감독 · 판타지 · 뮤지컬</p>
+          <p class="movie-desc">
+            초록빛 피부 때문에 사람들에게 오해받아온 엘파바와, 모두의 사랑을 받는 글린다가
+            서로를 이해하고 성장하며 진짜 우정을 찾아가는 이야기.
+            <br>
+            ‘오즈의 마법사’ 세계를 새로운 시선으로 풀어낸 감성적인 뮤지컬 영화.
+          </p>
+          <div class="tags">
+            <span class="tag">뮤지컬</span>
+            <span class="tag">우정</span>
+            <span class="tag">판타지</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 7번방의 선물 -->
+      <article class="movie-card">
+        <img class="movie-poster" src="7번방의 선물.jpg" alt="7번방의 선물 포스터">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">7번방의 선물</h3>
+            <span class="movie-year">2013</span>
+          </div>
+          <p class="movie-meta">이환경 감독 · 드라마</p>
+          <p class="movie-desc">
+            지적 장애를 가진 아빠와 딸, 그리고 7번방 수용자들이 만들어가는
+            유쾌하면서도 눈물 나는 기적 같은 이야기.
+          </p>
+          <div class="tags">
+            <span class="tag">부성애</span>
+            <span class="tag">눈물주의</span>
+            <span class="tag">감동</span>
+          </div>
+        </div>
+        
+      </article>
+
+      <article class="movie-card">
+        <img class="movie-poster" src="coming soon.jpg" alt="다음에 업데이트 됩니다.">
+        <div class="movie-content">
+          <div class="movie-title-row">
+            <h3 class="movie-title">다음에 업데이트 됩니다.</h3>
+          </div>
+        </div>  
+        
+      </article>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>GGV</span>
+  </footer>
+</body>
+</html>
